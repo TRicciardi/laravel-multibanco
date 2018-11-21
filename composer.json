@@ -1,0 +1,34 @@
+{
+    "name": "tricciardi/laravel-multibanco",
+    "description": "This package will add Easypay and IfThen MB payment methods",
+    "authors": [
+        {
+            "name": "Tiago Ricciardi",
+            "email": "tiago.ricciardi@browserbox.pt"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "laravel/framework": "5.7.*",
+        "laravel/tinker": "^1.0",
+        "Nathanmac/Parser": "^4.3",
+        "guzzlehttp/guzzle": "^6.3"
+    },
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "tricciardi\\LaravelMultibanco\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "extra": {
+      "laravel": {
+        "providers": [
+            "tricciardi\\LaravelMultibanco\\MultibancoServiceProvider"
+        ]
+      }
+    },
+}
