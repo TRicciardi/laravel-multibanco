@@ -19,7 +19,7 @@ class TestController extends Controller
       $reference = $multibanco->getReference(1,1, '2018-11-30');
 
       $mbway = $multibanco->mbway_authorize('teste','919020759');
-      
+
     }
 }
 ```
