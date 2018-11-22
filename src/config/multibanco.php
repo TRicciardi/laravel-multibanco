@@ -10,7 +10,7 @@ return [
     'ep_code'=> env('EP_CODE',''),
     'ep_entity'=> env('EP_ENTITY',''),
     'ep_url'=> env('EP_URL','https://www.easypay.pt/'),
-    'max_date'=> env('EP_MAX_DATE',false),
+    'max_date'=> env('EP_MAX_DATE',null),
   ],
   'ifthen' => [
     'key' => env('IFTHEN_KEY',null),

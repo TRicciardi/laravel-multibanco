@@ -36,7 +36,9 @@ class Multibanco
       $this->reference->foreign_id = $foreign_key;
     }
     $this->reference->value = $value;
-    $this->reference->expiration_date = $max_date;
+    if($max_date != null) {
+      $this->reference->expiration_date = $max_date;      
+    }
     $this->reference->save();
 
     if( config('multibanco.type') == 'ifthen' ) {
