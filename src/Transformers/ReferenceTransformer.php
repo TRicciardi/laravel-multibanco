@@ -1,6 +1,6 @@
 <?php
 
-namespace tricciardi\LaravelMultibanco;
+namespace tricciardi\LaravelMultibanco\Transformers;
 
 use League\Fractal\TransformerAbstract;
 use tricciardi\LaravelMultibanco\Reference;
