@@ -73,7 +73,7 @@ class GetPayments extends Command
                                                                         ] ]);
 
         $xml = $response->getBody() ;
-        $payment =  Parser::xml($xml);
+        $payment =  xml_string_to_array($xml);
 
         //verify payment, process notification
         if( $payment['ep_status'] == 'ok0') {

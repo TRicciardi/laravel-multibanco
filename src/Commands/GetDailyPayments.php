@@ -66,7 +66,7 @@ class GetDailyPayments extends Command
                                                                               ] ]);
 
       $xml = $response->getBody() ;
-      $payments =  Parser::xml($xml);
+      $payments =  xml_string_to_array($xml);
 
       //extract all references
       $notifications = $payments['ref_detail']['ref'];

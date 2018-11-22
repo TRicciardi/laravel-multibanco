@@ -14,7 +14,7 @@ class CreatEasypayNotificationsTable extends Migration
     public function up()
     {
         Schema::create('easypay_notifications', function (Blueprint $table) {
-          $table->increments('id')->nullable();
+          $table->increments('id');
           $table->string('ep_doc')->unique()->nullable();
           $table->string('ep_cin')->nullable();
           $table->string('ep_user')->nullable();

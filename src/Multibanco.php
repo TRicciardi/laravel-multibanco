@@ -1,11 +1,18 @@
 <?php namespace tricciardi\LaravelMultibanco;
 
-use tricciardi\LaravelMultibanco\Events\PaymentSuccess;
-use tricciardi\LaravelMultibanco\EasypayNotification;
+//events
 use \tricciardi\LaravelMultibanco\Events\PaymentReceived;
+
+//models
 use tricciardi\LaravelMultibanco\Reference;
+
+//exceptions
+use tricciardi\LaravelMultibanco\Exceptions\EasypayException;
+use tricciardi\LaravelMultibanco\Exceptions\IFThenException;
+
+//libs
 use GuzzleHttp\Client;
-use Parser;
+
 
 class Multibanco
 {
@@ -85,6 +92,7 @@ class Multibanco
 
     $xml = $response->getBody() ;
 
+
     //log the response from easypay for analys
     $this->reference->log = $xml;
     $this->reference->log .= "\r\nQuery:\r\n";
@@ -92,12 +100,13 @@ class Multibanco
     $this->reference->save();
 
     //parse reference from xml
-    $response =  Parser::xml($xml);
+    $response =  xml_string_to_array($xml);
+
 
     //if response not ok, delete and abort
-    if( ! $response['ep_status'] == 'ok0' ) {
+    if(   $response['ep_status'] !== 'ok0' ) {
       $this->reference->delete();
-      abort(400);
+      throw new EasypayException($response['ep_message']);
     }
 
     //set entity, reference and value
@@ -123,7 +132,7 @@ class Multibanco
 
     //if not configured, throw exception
     if(!$entity || !$subentity) {
-      abort(500, 'IFTHEN data is missing');
+      throw new IFThenException();
     }
 
     $order_id = "0000". $this->reference->id;
@@ -132,13 +141,13 @@ class Multibanco
     if(strlen($entity)<5)
     {
       $this->reference->delete();
-      abort(500, 'IFTHEN invalid entity');
+      throw new IFThenException( 'IFTHEN invalid entity');
     }else if(strlen($entity)>5){
       $this->reference->delete();
-      abort(500, 'IFTHEN invalid entity');
+      throw new IFThenException( 'IFTHEN invalid entity');
     }if(strlen($subentity)==0){
       $this->reference->delete();
-      abort(500, 'IFTHEN invalid entity');
+      throw new IFThenException( 'IFTHEN invalid entity');
     }
 
 
@@ -204,8 +213,10 @@ class Multibanco
 
 
     $xml = $response->getBody();
-    $response =  Parser::xml($xml);
-    return $response;
+    $response =  xml_string_to_array($xml);
+    if($response['ep_status'] !== 'ok0') {
+      throw new EasypayException('MBWAY error');
+    }
   }
 
 
@@ -235,8 +246,10 @@ class Multibanco
 
 
     $xml = $response->getBody();
-    $response =  Parser::xml($xml);
-    return $response;
+    $response =  xml_string_to_array($xml);
+    if($response['ep_status'] !== 'ok0') {
+      throw new EasypayException('MBWAY error');
+    }
   }
 
 
@@ -265,8 +278,11 @@ class Multibanco
 
 
     $xml = $response->getBody();
-    $response =  Parser::xml($xml);
-    return $response;
+
+    $response =  xml_string_to_array($xml);
+    if($response['ep_status'] !== 'ok0') {
+      throw new EasypayException('MBWAY error');
+    }
   }
 
 }
