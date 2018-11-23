@@ -46,13 +46,16 @@ class MultibancoController extends Controller
 
 
     public function notifyEasypay(Request $request) {
-      $notification = new EasypayNotification;
-      $notification->ep_cin = $request->input('ep_cin', config('multibanco.easypay.ep_cin') );
-      $notification->ep_user = $request->input('ep_user', config('multibanco.easypay.ep_user') );
-      $notification->ep_doc = $request->input('ep_doc' );
-      $notification->ep_type = $request->input('ep_type' ,'');
-      $notification->ep_status = 'ok0';
-      $notification->save();
+      $notification = EasypayNotification::where('ep_doc',$request->input('ep_doc' ))->first();
+      if(!$notification) {
+        $notification = new EasypayNotification;
+        $notification->ep_cin = $request->input('ep_cin', config('multibanco.easypay.ep_cin') );
+        $notification->ep_user = $request->input('ep_user', config('multibanco.easypay.ep_user') );
+        $notification->ep_doc = $request->input('ep_doc' );
+        $notification->ep_type = $request->input('ep_type' ,'');
+        $notification->ep_status = 'ok0';
+        $notification->save();        
+      }
       return view('multibanco::notification', compact('notification') );
     }
 
