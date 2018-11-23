@@ -6,6 +6,15 @@ if(! function_exists('format_reference') ) {
   }
 }
 
+if(! function_exists('xml_string_to_array') ) {
+  function xml_string_to_array($xml) {
+    $xml = simplexml_load_string((string)$xml);
+    $json = json_encode($xml);
+    $array = json_decode($json,TRUE);
+    return $array;
+  }
+}
+
 if(! function_exists('ifthen_format') ) {
   function ifthen_format($number) {
     $verifySepDecimal = number_format(99,2);

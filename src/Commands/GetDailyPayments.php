@@ -55,10 +55,10 @@ class GetDailyPayments extends Command
 
       // get last 3 months of payments
       $response = $client->request('GET','_s/api_easypay_040BG1.php',['query'=>[
-                                                                            'ep_user'=>config('multibanco.EP_USER'),
-                                                                            'ep_entity'=>config('multibanco.EP_ENTITY'),
-                                                                            'ep_cin'=>config('multibanco.EP_CIN'),
-                                                                            's_code'=>config('multibanco.EP_CODE'),
+                                                                            'ep_user'=>config('multibanco.easypay.ep_user'),
+                                                                            'ep_entity'=>config('multibanco.easypay.ep_entity'),
+                                                                            'ep_cin'=>config('multibanco.easypay.ep_cin'),
+                                                                            's_code'=>config('multibanco.easypay.ep_code'),
                                                                             'o_list_type'=>'date',
                                                                             'o_ini'=>date("Y-m-d",strtotime("now - 3 months")),
                                                                             'o_last'=>date("Y-m-d",strtotime("now - 1 day")),
@@ -66,7 +66,7 @@ class GetDailyPayments extends Command
                                                                               ] ]);
 
       $xml = $response->getBody() ;
-      $payments =  Parser::xml($xml);
+      $payments =  xml_string_to_array($xml);
 
       //extract all references
       $notifications = $payments['ref_detail']['ref'];
