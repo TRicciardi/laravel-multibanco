@@ -83,7 +83,9 @@ class Multibanco
 
 
 
-    $xml = $response->getBody() ;
+    $body = $response->getBody() ;
+    $xml = simplexml_load_string($body);
+    dd((string) $xml->ep_status);
 
     //log the response from easypay for analys
     $this->reference->log = $xml;
@@ -93,6 +95,7 @@ class Multibanco
 
     //parse reference from xml
     $response =  Parser::xml($xml);
+
 
     //if response not ok, delete and abort
     if( ! $response['ep_status'] == 'ok0' ) {

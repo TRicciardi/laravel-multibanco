@@ -21,8 +21,6 @@ class MbreferencesTable extends Migration
             $table->string('entity')->nullable();
             $table->string('reference')->nullable();
             $table->decimal('value',20,2)->nullable();
-            $table->decimal('paid_value',20,2)->nullable();
-            $table->datetime('paid_date')->nullable();
             $table->date('expiration_date')->nullable();
             $table->longText('log')->nullable();
             $table->timestamps();

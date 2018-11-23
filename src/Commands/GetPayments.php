@@ -100,6 +100,9 @@ class GetPayments extends Command
             $ref->state=1;
             $ref->save();
             event(new PaymentReceived($ref->foreign_id,$not->ep_value));
+          } else {
+            $not->ep_status = 'no-reference';
+            $not->save();
           }
         }
       }
