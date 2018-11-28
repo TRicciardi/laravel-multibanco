@@ -92,8 +92,7 @@ class Multibanco
 
 
 
-    $body = $response->getBody() ;
-    $xml = simplexml_load_string($body);
+    $body = $response->getBody() ;   
 
 
     //log the response from easypay for analys
