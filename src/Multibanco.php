@@ -92,11 +92,11 @@ class Multibanco
 
 
 
-    $body = $response->getBody() ;   
+    $xml = $response->getBody() ;
 
 
     //log the response from easypay for analys
-    $this->reference->log = $xml;
+    $this->reference->log = (string)$xml;
     $this->reference->log .= "\r\nQuery:\r\n";
     $this->reference->log .= json_encode($query);
     $this->reference->save();
