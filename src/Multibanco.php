@@ -37,7 +37,7 @@ class Multibanco
     }
     $this->reference->value = $value;
     if($max_date != null) {
-      $this->reference->expiration_date = $max_date;      
+      $this->reference->expiration_date = $max_date;
     }
     $this->reference->save();
 
@@ -94,7 +94,6 @@ class Multibanco
 
     $body = $response->getBody() ;
     $xml = simplexml_load_string($body);
-    dd((string) $xml->ep_status);
 
 
     //log the response from easypay for analys
