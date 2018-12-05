@@ -26,7 +26,7 @@ class GetDailyPayments extends Command
     /**
      * Create a new command instance.
      *
-     * 
+     *
      * @return void
      */
     public function __construct()
@@ -91,7 +91,7 @@ class GetDailyPayments extends Command
           $not->ep_entity = $payment['ep_entity'];
           $not->ep_reference = $payment['ep_reference'];
           $not->ep_value = $payment['ep_value'];
-          $not->t_key = $payment['t_key'];
+          $not->t_key = ($payment['t_key'])?$payment['t_key']:'';
           $not->ep_value = $payment['ep_value'];
           $not->ep_payment_type = $payment['ep_payment_type'];
           $not->ep_value_fixed = $payment['ep_value_fixed'];
@@ -106,7 +106,7 @@ class GetDailyPayments extends Command
           $ref = Reference::where('ep_reference',$not->ep_reference)->first();
           if($ref) {
             //reference exists, set state 1 if needed
-            if($ref->state != 0) {
+            if($ref->state != 1) {
               $ref->paid_value = $not->ep_value;
               $ref->paid_date = $not->ep_date;
               $ref->state=1;
