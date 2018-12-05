@@ -82,7 +82,7 @@ class GetPayments extends Command
           $not->ep_entity = $payment['ep_entity'];
           $not->ep_reference = $payment['ep_reference'];
           $not->ep_value = $payment['ep_value'];
-          $not->t_key = $payment['t_key'];
+          $not->t_key = ($payment['t_key'])?$payment['t_key']:'';
           $not->ep_value = $payment['ep_value'];
           $not->ep_payment_type = $payment['ep_payment_type'];
           $not->ep_value_fixed = $payment['ep_value_fixed'];
@@ -93,13 +93,19 @@ class GetPayments extends Command
           $not->ep_date = $payment['ep_date'];
           $not->save();
           $ref = Reference::where('reference',$not->ep_reference)->first();
-          //if reference not paid, mark as paid
-          if($ref->state == 0) {
-            $ref->paid_value = $not->ep_value;
-            $ref->paid_date = $not->ep_date;
-            $ref->state=1;
-            $ref->save();
-            event(new PaymentReceived($ref->foreign_id,$not->ep_value));
+
+          if($ref) {
+            //if reference not paid, mark as paid
+            if($ref->state == 0) {
+              $ref->paid_value = $not->ep_value;
+              $ref->paid_date = $not->ep_date;
+              $ref->state=1;
+              $ref->save();
+              event(new PaymentReceived($ref->foreign_id,$not->ep_value));
+            } else {
+              $not->ep_status = 'inactive-reference';
+              $not->save();
+            }
           } else {
             $not->ep_status = 'no-reference';
             $not->save();
