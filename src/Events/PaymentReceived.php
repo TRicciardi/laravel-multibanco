@@ -14,6 +14,7 @@ class PaymentReceived
 {
     use InteractsWithSockets, SerializesModels;
 
+    public $foreign_model;
     public $foreign_id;
     public $value;
     /**
@@ -21,8 +22,9 @@ class PaymentReceived
      *
      * @return void
      */
-     public function __construct($foreign_id,$value)
+     public function __construct($foreign_model,$foreign_id,$value)
      {
+         $this->foreign_model = $foreign_model;
          $this->foreign_id = $foreign_id;
          $this->value = $value;
      }
