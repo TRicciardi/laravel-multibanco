@@ -30,13 +30,13 @@ class Multibanco
    *
    * @return Reference
    */
-  public function getReference($value, $foreign_key=null, $max_date=null,$name=null,  $foreign_model=null) {
+  public function getReference($value, $foreign_key=null, $max_date=null,$name=null,  $foreign_type=null) {
     $this->reference = new Reference;
     if($foreign_key) {
       $this->reference->foreign_id = $foreign_key;
     }
-    if($foreign_model) {
-      $this->reference->foreign_model = $foreign_model;
+    if($foreign_type) {
+      $this->reference->foreign_type = $foreign_type;
     }
     $this->reference->value = $value;
     if($max_date != null) {
