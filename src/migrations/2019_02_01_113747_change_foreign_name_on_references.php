@@ -14,7 +14,7 @@ class ChangeForeignNameOnReferences extends Migration
     public function up()
     {
       Schema::table('mb_references', function (Blueprint $table) {
-          $table->renameColumn('foreign_type','foreign_type');
+          $table->renameColumn('foreign_model','foreign_type');
       });
     }
 
@@ -26,7 +26,7 @@ class ChangeForeignNameOnReferences extends Migration
     public function down()
     {
       Schema::table('mb_references', function (Blueprint $table) {
-          $table->renameColumn('foreign_type','foreign_type');
+          $table->renameColumn('foreign_type','foreign_model');
       });
     }
 }

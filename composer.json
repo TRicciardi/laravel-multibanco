@@ -8,6 +8,7 @@
         }
     ],
     "require": {
+        "doctrine/dbal": "^2.9",
         "guzzlehttp/guzzle": "^6.3"
     },
     "minimum-stability": "dev",
