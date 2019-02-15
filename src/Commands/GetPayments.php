@@ -101,8 +101,8 @@ class GetPayments extends Command
               $ref->paid_date = $not->ep_date;
               $ref->state=1;
               $ref->save();
-              event(new PaymentReceived($ref->foreign_id,$not->ep_value));
-            } 
+              event(new PaymentReceived($ref->foreign_type, $ref->foreign_id, $not->ep_value));
+            }
           } else {
             $not->ep_status = 'no-reference';
             $not->save();
