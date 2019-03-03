@@ -104,11 +104,9 @@ class GetDailyPayments extends Command
           $not->ep_value_tax = $payment['ep_value_tax'];
           $not->ep_value_transf = $payment['ep_value_transf'];
           $not->ep_date_transf = $payment['ep_date_transf'];
-          $not->ep_date = $payment['ep_payment_date'];
+          $not->ep_date = $payment['ep_date'];
           $not->save();
-          //notification processed.
-          //check if there is a reference for this notification
-          $ref = Reference::where('ep_reference',$not->ep_reference)->first();
+          $ref = Reference::where('reference',$not->ep_reference)->first();
           if($ref) {
             //reference exists, set state 1 if needed
             if($ref->state != 1) {
