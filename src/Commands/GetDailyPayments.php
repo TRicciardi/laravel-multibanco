@@ -4,6 +4,11 @@ namespace tricciardi\LaravelMultibanco\Commands;
 
 use Illuminate\Console\Command;
 use tricciardi\LaravelMultibanco\Helpers\PaymentHelpers;
+use tricciardi\LaravelMultibanco\Events\PaymentSuccess;
+use tricciardi\LaravelMultibanco\EasypayNotification;
+use \tricciardi\LaravelMultibanco\Events\PaymentReceived;
+use tricciardi\LaravelMultibanco\Reference;
+use GuzzleHttp\Client;
 
 class GetDailyPayments extends Command
 {
