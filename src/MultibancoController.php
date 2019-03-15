@@ -4,6 +4,7 @@ namespace tricciardi\LaravelMultibanco;
 
 use App\Http\Controllers\Controller;
 use tricciardi\LaravelMultibanco\EasypayNotification;
+use tricciardi\LaravelMultibanco\MBNotification;
 use tricciardi\LaravelMultibanco\Reference;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
@@ -45,6 +46,31 @@ class MultibancoController extends Controller
     }
 
 
+    public function notifyEupago(Request $request) {
+      //valor=100&canal=nome_canal&referencia=10357XXXXXXXX&transacao=99&identificador=205
+      $eupago = new \stdClass;
+      $eupago->valor = request('valor');
+      $eupago->canal = request('canal');
+      $eupago->transacao = request('transacao');
+      $eupago->identificador = request('identificador');
+      $eupago->referencia = request('referencia');
+
+      $key = $eupago->referencia.'|'.$eupago->transacao;
+
+      $notification = MBNotification::where('ref_identifier',$key)->first();
+
+      if(!$notification) {
+        $notification = new MBNotification;
+        $notification->ref_identifier = $key;
+        $notification->referencia = $eupago->referencia;
+        $notification->value = $eupago->valor;
+        $notification->state = 0;
+        $notification->payload = json_encode($eupago);
+        $notification->save();
+      }
+    }
+
+
     public function notifyEasypay(Request $request) {
       $notification = EasypayNotification::where('ep_doc',$request->input('ep_doc' ))->first();
       if(!$notification) {
@@ -54,7 +80,7 @@ class MultibancoController extends Controller
         $notification->ep_doc = $request->input('ep_doc' );
         $notification->ep_type = $request->input('ep_type' ,'');
         $notification->ep_status = 'ok0';
-        $notification->save();        
+        $notification->save();
       }
       return view('multibanco::notification', compact('notification') );
     }

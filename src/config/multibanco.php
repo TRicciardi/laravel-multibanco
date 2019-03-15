@@ -17,5 +17,9 @@ return [
     'entity' => env('IFTHEN_ENTITY',null),
     'subentity' => env('IFTHEN_SUBENTITY',null),
   ],
+  'eupago' => [
+    'key'=>env('EUPAGO_KEY',null),
+    'url' => env('EUPAGO_URL', 'https://replica.eupago.pt/clientes/rest_api/'),
+  ],
 
 ];
