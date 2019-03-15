@@ -2,6 +2,9 @@
 
 namespace tricciardi\LaravelMultibanco\Contracts;
 
+use Illuminate\Http\Request;
+use tricciardi\LaravelMultibanco\Reference;
+
 interface Multibanco
 {
   /**
@@ -10,7 +13,7 @@ interface Multibanco
    *
    * @return Reference
    */
-    public function getReference($reference, $name);
+    public function getReference(Reference $reference, $name);
 
   /**
    * make mbway purchase.
@@ -18,8 +21,15 @@ interface Multibanco
    *
    * @return boolean
    */
-   public function purchaseMBWay($reference, $payment_title, $phone_number);
+   public function purchaseMBWay(Reference $reference, $payment_title, $phone_number);
 
+   /**
+    * check payments
+    *
+    *
+    * @return boolean
+    */
+   public function notificationReceived(Request $request);
 
   /**
    * check payments

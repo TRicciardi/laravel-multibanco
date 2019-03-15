@@ -1,15 +1,10 @@
 <?php namespace tricciardi\LaravelMultibanco;
 
-//events
-use \tricciardi\LaravelMultibanco\Events\PaymentReceived;
-
 //models
 use tricciardi\LaravelMultibanco\Reference;
 
-
-
 //libs
-use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 
 
 class Multibanco
@@ -19,17 +14,9 @@ class Multibanco
   protected $provider = null;
 
   public function __construct($value=null, $foreign_key=null, $max_date=null,$name=null, $foreign_type=null) {
-    switch(config('multibanco.type')) {
-      case 'easypay':
-        $this->provider = new \tricciardi\LaravelMultibanco\Providers\Easypay;
-        break;
-      case 'ifthen':
-        $this->provider = new \tricciardi\LaravelMultibanco\Providers\Ifthen;
-        break;
-      case 'eupago':
-        $this->provider = new \tricciardi\LaravelMultibanco\Providers\Eupago;
-        break;
-    }
+    $type = config('multibanco.type');
+    $provider = config('multibanco.'.$type.'.provider');
+    $this->provider = new $provider;
     if($value) {
       $this->getReference($value, $foreign_key, $max_date,$name);
     }
@@ -78,6 +65,10 @@ class Multibanco
    */
   public function mbway_purchase($payment_title, $phone_number) {
     return $this->provider->purchaseMBWay($this->reference, $payment_title, $phone_number);
+  }
+
+  public function notificationReceived(Request $request) {
+    return $this->provider->notificationReceived($request);
   }
 
   public function processNotifications() {

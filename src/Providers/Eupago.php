@@ -14,6 +14,7 @@ use tricciardi\LaravelMultibanco\Exceptions\EupagoException;
 
 //libs
 use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 
 class Eupago implements Multibanco {
 
@@ -23,7 +24,7 @@ class Eupago implements Multibanco {
    *
    * @return Reference
    */
-  public function getReference($reference, $name='' ) {
+  public function getReference(Reference $reference, $name='' ) {
 
     $client = new Client([
         'base_uri' => config('multibanco.eupago.url'),
@@ -63,10 +64,36 @@ class Eupago implements Multibanco {
     return $reference;
   }
 
-  public function purchaseMBWay($reference, $payment_title, $phone_number) {
+  public function purchaseMBWay(Reference $reference, $payment_title, $phone_number) {
     return false;
   }
 
+  public function notificationReceived(Request $request) {
+    //valor=100&canal=nome_canal&referencia=10357XXXXXXXX&transacao=99&identificador=205
+    $eupago = new \stdClass;
+    $eupago->valor = request('valor');
+    $eupago->canal = request('canal');
+    $eupago->transacao = request('transacao','');
+    $eupago->identificador = request('identificador','');
+    $eupago->referencia = request('referencia','');
+    if($eupago->referencia == '' || $eupago->transacao == '') {
+      abort(422, 'Invalid input');
+    }
+    $key = $eupago->referencia.'|'.$eupago->transacao;
+
+    $notification = MBNotification::where('ref_identifier',$key)->first();
+
+    if(!$notification) {
+      $notification = new MBNotification;
+      $notification->ref_identifier = $key;
+      $notification->reference = $eupago->referencia;
+      $notification->value = $eupago->valor;
+      $notification->state = 0;
+      $notification->payload = json_encode($eupago);
+      $notification->save();
+    }
+
+  }
 
   /**
   * Process received payment notifications

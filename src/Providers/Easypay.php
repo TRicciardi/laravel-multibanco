@@ -14,6 +14,8 @@ use \tricciardi\LaravelMultibanco\Events\PaymentReceived;
 
 //libs
 use GuzzleHttp\Client;
+use Illuminate\Http\Request;
+
 
 class Easypay implements Multibanco {
 
@@ -23,7 +25,7 @@ class Easypay implements Multibanco {
    *
    * @return Reference
    */
-  public function getReference($reference, $name='' ) {
+  public function getReference(Reference $reference, $name='' ) {
 
     $client = new Client([
         'base_uri' => config('multibanco.easypay.ep_url'),
@@ -91,7 +93,7 @@ class Easypay implements Multibanco {
     return $reference;
   }
 
-  public function purchaseMBWay($reference, $payment_title, $phone_number) {
+  public function purchaseMBWay(Reference $reference, $payment_title, $phone_number) {
     return $this->mbway_purchase($reference, $payment_title, $phone_number);
   }
 
@@ -196,6 +198,24 @@ class Easypay implements Multibanco {
         break;
     }
     return true;
+  }
+
+  public function notificationReceived(Request $request) {
+    if(!$request->input('ep_doc', null )) {
+      abort(422,'Invalid input');
+    }
+    $notification = EasypayNotification::where('ep_doc',$request->input('ep_doc' ))->first();
+    if(!$notification) {
+      $notification = new EasypayNotification;
+      $notification->ep_cin = $request->input('ep_cin', config('multibanco.easypay.ep_cin') );
+      $notification->ep_user = $request->input('ep_user', config('multibanco.easypay.ep_user') );
+      $notification->ep_doc = $request->input('ep_doc' );
+      $notification->ep_type = $request->input('ep_type' ,'');
+      $notification->ep_status = 'ok0';
+      $notification->save();
+    }
+    
+    return view('multibanco::notification', compact('notification') );
   }
 
   /**

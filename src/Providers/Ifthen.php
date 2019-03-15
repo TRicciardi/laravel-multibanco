@@ -11,6 +11,7 @@ use tricciardi\LaravelMultibanco\Exceptions\IFThenException;
 
 //libs
 use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 
 class Ifthen implements Multibanco {
 
@@ -20,7 +21,7 @@ class Ifthen implements Multibanco {
    *
    * @return Reference
    */
-  public function getReference($reference, $name='' ) {
+  public function getReference(Reference $reference, $name='' ) {
     $chk_val = 0;
     $entity = config('multibanco.ifthen.entity',null);
     $subentity = config('multibanco.ifthen.subentity',null);
@@ -82,14 +83,38 @@ class Ifthen implements Multibanco {
     return $reference;
   }
 
-  public function purchaseMBWay($reference, $payment_title, $phone_number) {
+  public function purchaseMBWay(Reference $reference, $payment_title, $phone_number) {
     throw new \Exception('MBWay not supported');
+  }
+
+  public function notificationReceived(Request $request) {
+    $our_key = config('multibanco.ifthen.key');
+    $key = request('chave');
+    if($key != $our_key)
+      abort(403,'Not allowed');
+    $entidade = request('entidade');
+    $referencia = request('referencia');
+    $valor = request('valor');
+    $datahorapag = request('datahorapag');
+    $terminal = request('terminal');
+
+    $ref = Reference::where('ep_reference',$referencia)->where('ep_entity',$entidade)->first();
+    if($ref && $ref->state != 1 ) {
+      if($ref->registration && $ref->registration->state >= 0) {
+        $ref->state = 1;
+        $ref->save();
+        event(new \tricciardi\LaravelMultibanco\Events\PaymentReceived($ref->registration_id,$ref->payment_id,$valor));
+      } else {
+        $ref->state = 1;
+        $ref->save();
+      }
+    }
   }
 
   public function processNotification() {
     //nothing to do
   }
-  
+
   public function getPayments($date_start, $date_end) {
     //nothing to do
   }
