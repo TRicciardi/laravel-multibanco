@@ -17,7 +17,7 @@ class GetDailyPayments extends Command
      *
      * @var string
      */
-    protected $signature = 'mb:getdaily';
+    protected $signature = 'mb:getdaily {until=1} {from=90}';
 
     /**
      * The console command description.
@@ -57,7 +57,12 @@ class GetDailyPayments extends Command
       $client = new Client([
           'base_uri' =>  config('multibanco.easypay.ep_url'),
       ]);
+      $until = (int) $this->argument('until');
+      $from = (int) $this->argument('from');
 
+      $mindate = date("Y-m-d",strtotime("now - ".$from." days"));
+      $maxdate = date("Y-m-d",strtotime("now - ".$until." days"));
+      $this->info( "fecthing from ".$mindate.' ('.$from.') to '.$maxdate." (".$until.")");
       // get last 3 months of payments
       $response = $client->request('GET','_s/api_easypay_040BG1.php',['query'=>[
                                                                             'ep_user'=>config('multibanco.easypay.ep_user'),
@@ -65,8 +70,8 @@ class GetDailyPayments extends Command
                                                                             'ep_cin'=>config('multibanco.easypay.ep_cin'),
                                                                             's_code'=>config('multibanco.easypay.ep_code'),
                                                                             'o_list_type'=>'date',
-                                                                            'o_ini'=>date("Y-m-d",strtotime("now - 3 months")),
-                                                                            'o_last'=>date("Y-m-d",strtotime("now - 1 day")),
+                                                                            'o_ini'=>$mindate,
+                                                                            'o_last'=>$maxdate,
 
                                                                               ] ]);
 
