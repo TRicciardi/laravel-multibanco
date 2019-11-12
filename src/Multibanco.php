@@ -133,8 +133,8 @@ class Multibanco
    */
   private function getIfThen() {
     $chk_val = 0;
-    $entity = config('ifthenpay.entity',null);
-    $subentity = config('ifthenpay.subentity',null);
+    $entity = config('multibanco.ifthen.entity',null);
+    $subentity = config('multibanco.ifthen.subentity',null);
 
     //if not configured, throw exception
     if(!$entity || !$subentity) {
