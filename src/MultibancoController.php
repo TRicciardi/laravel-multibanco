@@ -31,14 +31,14 @@ class MultibancoController extends Controller
       $datahorapag = request('datahorapag');
       $terminal = request('terminal');
 
-      $ref = Reference::where('ep_reference',$referencia)->where('ep_entity',$entidade)->first();
+      $ref = Reference::where('reference',$referencia)->where('entity',$entidade)->first();
       if($ref && $ref->state != 1 ) {
         if($ref->registration && $ref->registration->state >= 0) {
           $ref->state = 1;
           $ref->save();
-          event(new \tricciardi\LaravelMultibanco\Events\PaymentReceived($ref->registration_id,$ref->payment_id,$valor));
+          event(new \tricciardi\LaravelMultibanco\Events\PaymentReceived($ref->foreign_type,$ref->foreign_id,$valor));
         } else {
-          $ref->state = 1;
+          $ref->state = 2;
           $ref->save();
         }
       }
@@ -54,7 +54,7 @@ class MultibancoController extends Controller
         $notification->ep_doc = $request->input('ep_doc' );
         $notification->ep_type = $request->input('ep_type' ,'');
         $notification->ep_status = 'ok0';
-        $notification->save();        
+        $notification->save();
       }
       return view('multibanco::notification', compact('notification') );
     }
