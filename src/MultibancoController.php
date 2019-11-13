@@ -33,14 +33,9 @@ class MultibancoController extends Controller
 
       $ref = Reference::where('reference',$referencia)->where('entity',$entidade)->first();
       if($ref && $ref->state != 1 ) {
-        if($ref->registration && $ref->registration->state >= 0) {
-          $ref->state = 1;
-          $ref->save();
-          event(new \tricciardi\LaravelMultibanco\Events\PaymentReceived($ref->foreign_type,$ref->foreign_id,$valor));
-        } else {
-          $ref->state = 2;
-          $ref->save();
-        }
+        $ref->state = 1;
+        $ref->save();
+        event(new \tricciardi\LaravelMultibanco\Events\PaymentReceived($ref->foreign_type,$ref->foreign_id,$valor));
       }
     }
 
