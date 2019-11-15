@@ -41,7 +41,7 @@ if(! function_exists('ifthen_format') ) {
 
       $i=(strlen($valorTmp)-1);
 
-      for($i;$i!=1;$i--)
+      for($i;$i>1;$i--)
       {
         if(substr($valorTmp,$i,1)=="." || substr($valorTmp,$i,1)==","){
           $hasSepDecimal = True;
@@ -51,7 +51,7 @@ if(! function_exists('ifthen_format') ) {
       }
     }
 
-    for($i=1;$i!=(strlen($valorTmp)-1);$i++)
+    for($i=1;$i<(strlen($valorTmp)-1);$i++)
     {
       if(substr($valorTmp,$i,1)=="." || substr($valorTmp,$i,1)=="," || substr($valorTmp,$i,1)==" "){
         $valorTmp = trim(substr($valorTmp,0,$i)).trim(substr($valorTmp,1+$i));
