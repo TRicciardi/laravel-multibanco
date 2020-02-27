@@ -13,6 +13,14 @@ return [
     'ep_url'=> env('EP_URL','https://www.easypay.pt/'),
     'max_date'=> env('EP_MAX_DATE',null),
   ],
+  'easypay2' => [
+    'provider' => tricciardi\LaravelMultibanco\Providers\Easypay2::class,
+    'url'=> env('EP2_URL','https://api.easypay.pt/2.0/'),
+    'accountid'=> env('EP2_ACCOUNT_ID',''),
+    'key'=> env('EP2_KEY',''),
+    'mode'=> env('EP2_MODE','prod'),
+    'max_date'=> env('EP_MAX_DATE',null),
+  ],
   'ifthen' => [
     'provider' => tricciardi\LaravelMultibanco\Providers\Ifthen::class,
     'key' => env('IFTHEN_KEY',null),
