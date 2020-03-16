@@ -17,9 +17,9 @@ class Multibanco
     $type = config('multibanco.type');
     $provider = config('multibanco.'.$type.'.provider');
     $this->provider = new $provider;
-    if($value) {
-      $this->getReference($value, $foreign_key, $max_date,$name);
-    }
+    // if($value) {
+    //   $this->getReference($value, $foreign_key, $max_date,$name);
+    // }
   }
 
   /**
@@ -52,7 +52,20 @@ class Multibanco
    *
    * @return Reference
    */
-  public function purchaseMBWay($payment_title, $phone_number) {
+  public function purchaseMBWay($phone_number, $value, $payment_title, $foreign_key=null, $max_date=null,$name=null,  $foreign_type=null) {
+    $this->reference = new Reference;
+    if($foreign_key) {
+      $this->reference->foreign_id = $foreign_key;
+    }
+    if($foreign_type) {
+      $this->reference->foreign_type = $foreign_type;
+    }
+    $this->reference->value = $value;
+    if($max_date != null) {
+      $this->reference->expiration_date = $max_date;
+    }
+    $this->reference->save();
+
     return $this->provider->purchaseMBWay($this->reference, $payment_title, $phone_number);
   }
 
