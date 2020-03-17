@@ -14,19 +14,15 @@ class PaymentReceived
 {
     use InteractsWithSockets, SerializesModels;
 
-    public $foreign_type;
-    public $foreign_id;
-    public $value;
+    public $reference;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-     public function __construct($foreign_type,$foreign_id,$value)
+     public function __construct($reference)
      {
-         $this->foreign_type = $foreign_type;
-         $this->foreign_id = $foreign_id;
-         $this->value = $value;
+         $this->reference = $reference;
      }
 
     /**

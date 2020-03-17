@@ -103,7 +103,7 @@ class Ifthen implements Multibanco {
       if($ref->registration && $ref->registration->state >= 0) {
         $ref->state = 1;
         $ref->save();
-        event(new \tricciardi\LaravelMultibanco\Events\PaymentReceived($ref->registration_id,$ref->payment_id,$valor));
+        event(new \tricciardi\LaravelMultibanco\Events\PaymentReceived($ref));
       } else {
         $ref->state = 1;
         $ref->save();

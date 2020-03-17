@@ -214,7 +214,7 @@ class Easypay implements Multibanco {
       $notification->ep_status = 'ok0';
       $notification->save();
     }
-    
+
     return view('multibanco::notification', compact('notification') );
   }
 
@@ -270,7 +270,7 @@ class Easypay implements Multibanco {
             $ref->paid_date = $not->ep_date;
             $ref->state=1;
             $ref->save();
-            event(new PaymentReceived($ref->foreign_type, $ref->foreign_id, $not->ep_value));
+            event(new PaymentReceived($ref));
           }
         } else {
           $not->ep_status = 'no-reference';
@@ -345,7 +345,7 @@ class Easypay implements Multibanco {
               $ref->paid_date = $not->ep_date;
               $ref->state=1;
               $ref->save();
-              event(new PaymentReceived($ref->foreign_type, $ref->foreign_id, $not->ep_value));
+              event(new PaymentReceived($ref));
             }
           } else {
             //unknown reference, set notification status to no-reference

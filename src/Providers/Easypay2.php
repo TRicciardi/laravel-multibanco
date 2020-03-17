@@ -245,7 +245,7 @@ class Easypay2 implements Multibanco {
             $ref->paid_value = $response->value;
             $ref->paid_date = $response->paid_at;
             $ref->save();
-            event(new PaymentReceived($ref->foreign_type, $ref->foreign_id, $response->value));
+            event(new PaymentReceived($ref));
             $not->state = 1;
             $not->save();
           }
@@ -289,7 +289,7 @@ class Easypay2 implements Multibanco {
           $mine->save();
           $notification->state = 1;
           $notification->save();
-          event(new PaymentReceived($mine->foreign_type, $mine->foreign_id, $mine->paid_value));
+          event(new PaymentReceived($mine));
         }
       } elseif(!$mine) {
         $notification->state = -1;

@@ -119,7 +119,7 @@ class Eupago implements Multibanco {
               $reference->log = json_encode($response);
               $reference->state=1;
               $reference->save();
-              event(new PaymentReceived($reference->foreign_type, $reference->foreign_id, $payment->valor));
+              event(new PaymentReceived($reference));
             }
           }
         }
