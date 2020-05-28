@@ -9,6 +9,9 @@ use tricciardi\LaravelMultibanco\Reference;
 //exceptions
 use tricciardi\LaravelMultibanco\Exceptions\IFThenException;
 
+//events
+use \tricciardi\LaravelMultibanco\Events\PaymentReceived;
+
 //libs
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -104,7 +107,7 @@ class Ifthen implements Multibanco {
     if($key != $our_key)
       abort(403,'Not allowed');
     if(request('type', 'mb') === 'mbway' ) {
-
+      return $this->mbwayNotification($request);
     }
     $entidade = request('entidade');
     $referencia = request('referencia');
@@ -121,15 +124,12 @@ class Ifthen implements Multibanco {
 
     $ref = Reference::where('reference',$referencia)->where('entity',$entidade)->first();
     if($ref && $ref->state != 1 ) {
-      if($ref->registration && $ref->registration->state >= 0) {
-        $ref->state = 1;
-        $ref->log .= json_encode($notification);
-        $ref->save();
-        event(new \tricciardi\LaravelMultibanco\Events\PaymentReceived($ref));
-      } else {
-        $ref->state = 1;
-        $ref->save();
-      }
+      $ref->state = 1;
+      $ref->paid_value = $notification->valor;
+      $ref->paid_date = $notification->datahorapag;
+      $ref->log .= json_encode($notification);
+      $ref->save();
+      event(new PaymentReceived($ref));
     }
   }
 
@@ -150,11 +150,13 @@ class Ifthen implements Multibanco {
 
     if($estado == 'PAGO') {
       $ref = Reference::where('provider_id', $idpedido)->first();
-      if($ref && $ref->value == $valor) {
-          $ref->state = 1;
-          $ref->log .= json_encode($notification);
-          $ref->save();
-          event(new \tricciardi\LaravelMultibanco\Events\PaymentReceived($ref));
+      if($ref && $ref->state != 1 ) {
+        $ref->state = 1;
+        $ref->paid_value = $notification->valor;
+        $ref->paid_date = $notification->datahorapag;
+        $ref->log .= json_encode($notification);
+        $ref->save();
+        event(new PaymentReceived($ref));
       }
     }
   }
