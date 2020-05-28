@@ -26,8 +26,9 @@ return [
     'key' => env('IFTHEN_KEY',null),
     'entity' => env('IFTHEN_ENTITY',null),
     'subentity' => env('IFTHEN_SUBENTITY',null),
-    'url'=> env('EP2_URL','https://www.ifthenpay.com/'),
+    'url'=> env('IFTHEN_URL','https://www.ifthenpay.com/'),
     'mbwaykey' => env('IFTHEN_MBWAY',null),
+    'backoffice_key' => env('IFTHEN_BACKOFFICE_KEY',null),
   ],
   'eupago' => [
     'provider' => tricciardi\LaravelMultibanco\Providers\Eupago::class,

@@ -18,9 +18,9 @@ class Ifthen implements Multibanco {
   private function getClient() {
     $client = new Client([
         'base_uri' => config('multibanco.ifthen.url'),
-        'headers' => [
-          'Content-Type' => 'Application/Json',
-        ]
+        // 'headers' => [
+        //   'Content-Type' => 'Application/Json',
+        // ]
     ]);
     return $client;
 
@@ -95,7 +95,7 @@ class Ifthen implements Multibanco {
   }
 
   public function purchaseMBWay(Reference $reference, $payment_title, $phone_number) {
-    throw new \Exception('MBWay not supported');
+    return $this->mbway_purchase($reference, $payment_title, $phone_number);
   }
 
   public function notificationReceived(Request $request) {
@@ -103,21 +103,58 @@ class Ifthen implements Multibanco {
     $key = request('chave');
     if($key != $our_key)
       abort(403,'Not allowed');
+    if(request('type', 'mb') === 'mbway' ) {
+
+    }
     $entidade = request('entidade');
     $referencia = request('referencia');
     $valor = request('valor');
     $datahorapag = request('datahorapag');
     $terminal = request('terminal');
 
+    $notification = new \stdClass;
+    $notification->entidade = $entidade;
+    $notification->referencia = $referencia;
+    $notification->valor = $valor;
+    $notification->datahorapag = $datahorapag;
+    $notification->terminal = $terminal;
+
     $ref = Reference::where('ep_reference',$referencia)->where('ep_entity',$entidade)->first();
     if($ref && $ref->state != 1 ) {
       if($ref->registration && $ref->registration->state >= 0) {
         $ref->state = 1;
+        $ref->log .= json_encode($notification);
         $ref->save();
         event(new \tricciardi\LaravelMultibanco\Events\PaymentReceived($ref));
       } else {
         $ref->state = 1;
         $ref->save();
+      }
+    }
+  }
+
+  //chave=[CHAVE_ANTI_PHISHING]&referencia=[REFERENCIA]&idpedido=[ID_TRANSACAO]&valor=[VALOR]&datahorapag=[DATA_HORA_PAGAMENTO]&estado=[ESTADO]
+  private function mbwayNotification(Request $request) {
+    $referencia = request('referencia');
+    $idpedido = request('idpedido');
+    $valor = request('valor');
+    $datahorapag = request('datahorapag');
+    $estado = request('estado');
+
+    $notification = new \stdClass;
+    $notification->estado = $estado;
+    $notification->referencia = $referencia;
+    $notification->valor = $valor;
+    $notification->datahorapag = $datahorapag;
+    $notification->idpedido = $idpedido;
+
+    if($estado == 'PAGO') {
+      $ref = Reference::where('provider_id', $idpedido)->first();
+      if($ref && $ref->value == $valor) {
+          $ref->state = 1;
+          $ref->log .= json_encode($notification);
+          $ref->save();
+          event(new \tricciardi\LaravelMultibanco\Events\PaymentReceived($ref));
       }
     }
   }
@@ -128,6 +165,42 @@ class Ifthen implements Multibanco {
 
   public function getPayments($date_start, $date_end) {
     //nothing to do
+    // https://www.ifthenpay.com
+
+    $body = [];
+    $body['chavebackoffice'] = config('multibanco.ifthen.backoffice_key');
+    $body['entidade'] = config('multibanco.ifthen.entity');
+    $body['subentidade'] = config('multibanco.ifthen.subentity');
+    $body['dtHrInicio'] = date('d-m-Y 00:00:00', strtotime($date_start));
+    $body['dtHrFim'] = date('d-m-Y 23:59:59', strtotime($date_end));
+    $body['referencia'] = '';
+    $body['valor'] = '';
+    $body['sandbox'] = 0;
+    // $body['nrtlm'] = $phone_number;
+    // $body['email'] = '';
+    // $body['descricao'] = $payment_title;
+    $client = $this->getClient();
+
+    //request reference from easypay
+    $response = $client->request('POST','/IfmbWS/WsIfmb.asmx/GetPaymentsJsonV2', [
+                                                    'form_params'=>$body ,
+                                                  ]
+                                  );
+
+    $references = json_decode((string) $response->getBody());
+
+    foreach($references as $ref) {
+      $mine = Reference::where('reference', $ref->Referencia)->first();
+      if($mine && $mine->state != 1) {
+        $mine->state = 1;
+        $mine->paid_value = $ref->value;
+        $mine->paid_date = $ref->paid_at;
+        $mine->save();
+        $notification->state = 1;
+        $notification->save();
+        event(new PaymentReceived($mine));
+      }
+    }
   }
 
   /*
@@ -145,31 +218,37 @@ class Ifthen implements Multibanco {
   *
   */
 
-  public function mbway($reference, $payment_title, $phone_number) {
-    $data = [];
-    $data['canal'] = '03';
-    $data['referencia'] = $reference->id;
-    $data['valor'] = $reference->value;
-    $data['nrtlm'] = $phone_number;
-    $data['descricao'] = $payment_title;
+  public function mbway_purchase($reference, $payment_title, $phone_number) {
+    $body = [];
+    $body['MbWayKey'] = config('multibanco.ifthen.mbwaykey');
+    $body['canal'] = '03';
+    $body['referencia'] = $reference->id;
+    $body['valor'] = $reference->value;
+    $body['nrtlm'] = $phone_number;
+    $body['email'] = '';
+    $body['descricao'] = $payment_title;
     $client = $this->getClient();
 
     //request reference from easypay
-    $response = $client->request('POST','mbwayws/IfthenPayMBW.asmx/SetPedidoJSON', [
-                                                    'POST'=>$body ,
+    $response = $client->request('POST','/mbwayws/IfthenPayMBW.asmx/SetPedidoJSON', [
+                                                    'form_params'=>$body ,
                                                   ]
                                   );
 
 
-    $reply = $response->getBody() ;
-
-    $reference->log = (string)$reply;
+    $reply = json_decode((string) $response->getBody()) ;
+    $reference->provider_id = $reply->IdPedido;
+    if($reply->Estado !== '000') {
+      throw new IFThenException('Erro MBWAY');
+    }
+    $reference->log = json_encode($reply);
     $reference->log .= "\r\nQuery:\r\n";
     $reference->log .= json_encode($body);
     $reference->save();
-    
+    //return reference
+    return $reference;
+
     // /
     // MbWayKey=string&canal=string&referencia=string&valor=string&nrtlm=string&email=string&descricao=string
-
   }
 }
