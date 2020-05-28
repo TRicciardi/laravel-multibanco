@@ -15,6 +15,17 @@ use Illuminate\Http\Request;
 
 class Ifthen implements Multibanco {
 
+  private function getClient() {
+    $client = new Client([
+        'base_uri' => config('multibanco.ifthen.url'),
+        'headers' => [
+          'Content-Type' => 'Application/Json',
+        ]
+    ]);
+    return $client;
+
+  }
+
   /**
    * Get Easypay reference.
    *
@@ -119,5 +130,46 @@ class Ifthen implements Multibanco {
     //nothing to do
   }
 
+  /*
+  *
+  * MbWayKey - (Obrigatório) fornecido pela IFTHENPAY aquando da celebração do
+    contrato.
+    • canal - (Obrigatório) no caso desta API terá de ter sempre o valor constante “03”.
+    • referencia – (Obrigatório) Identificador do pagamento a definir pelo cliente (ex.
+    número da fatura, encomenda, etc…); Máximo 15 caracteres.
+    • valor - (Obrigatório) valor a cobrar.
+    • nrtlm - (Obrigatório) Número do telemóvel do cliente.
+    • email - (Opcional) email do cliente.
+    • descricao - (Obrigatório) descrição do pagamento (pode utilizar a tag [REFERENCIA]
+    caso pretenda que a descrição seja igual à referência); Máximo 50 caracteres.
+  *
+  */
 
+  public function mbway($reference, $payment_title, $phone_number) {
+    $data = [];
+    $data['canal'] = '03';
+    $data['referencia'] = $reference->id;
+    $data['valor'] = $reference->value;
+    $data['nrtlm'] = $phone_number;
+    $data['descricao'] = $payment_title;
+    $client = $this->getClient();
+
+    //request reference from easypay
+    $response = $client->request('POST','mbwayws/IfthenPayMBW.asmx/SetPedidoJSON', [
+                                                    'POST'=>$body ,
+                                                  ]
+                                  );
+
+
+    $reply = $response->getBody() ;
+
+    $reference->log = (string)$reply;
+    $reference->log .= "\r\nQuery:\r\n";
+    $reference->log .= json_encode($body);
+    $reference->save();
+    
+    // /
+    // MbWayKey=string&canal=string&referencia=string&valor=string&nrtlm=string&email=string&descricao=string
+
+  }
 }
