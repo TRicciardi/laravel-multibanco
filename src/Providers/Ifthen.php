@@ -119,7 +119,7 @@ class Ifthen implements Multibanco {
     $notification->datahorapag = $datahorapag;
     $notification->terminal = $terminal;
 
-    $ref = Reference::where('ep_reference',$referencia)->where('ep_entity',$entidade)->first();
+    $ref = Reference::where('reference',$referencia)->where('entity',$entidade)->first();
     if($ref && $ref->state != 1 ) {
       if($ref->registration && $ref->registration->state >= 0) {
         $ref->state = 1;
