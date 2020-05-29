@@ -126,7 +126,7 @@ class Ifthen implements Multibanco {
     if($ref && $ref->state != 1 ) {
       $ref->state = 1;
       $ref->paid_value = $notification->valor;
-      $ref->paid_date = $notification->datahorapag;
+      $ref->paid_date = date("Y-m-d H:i:s", strtotime($notification->datahorapag));
       $ref->log .= json_encode($notification);
       $ref->save();
       event(new PaymentReceived($ref));
@@ -153,7 +153,7 @@ class Ifthen implements Multibanco {
       if($ref && $ref->state != 1 ) {
         $ref->state = 1;
         $ref->paid_value = $notification->valor;
-        $ref->paid_date = $notification->datahorapag;
+        $ref->paid_date = date("Y-m-d H:i:s", strtotime($notification->datahorapag));
         $ref->log .= json_encode($notification);
         $ref->save();
         event(new PaymentReceived($ref));
@@ -195,11 +195,10 @@ class Ifthen implements Multibanco {
       $mine = Reference::where('reference', $ref->Referencia)->first();
       if($mine && $mine->state != 1) {
         $mine->state = 1;
-        $mine->paid_value = $ref->value;
-        $mine->paid_date = $ref->paid_at;
+        $mine->paid_value = $ref->Valor;
+        $mine->paid_date = date("Y-m-d H:i:s", strtotime($ref->DtHrPagamento));
+        $mine->log .= json_encode($ref);
         $mine->save();
-        $notification->state = 1;
-        $notification->save();
         event(new PaymentReceived($mine));
       }
     }
