@@ -44,7 +44,7 @@ class Easypay2 implements Multibanco {
 
     $body = [
       'type'=> 'sale',
-      'key' => 'laravel-multibanco',
+      'key' => $reference->foreign_key,
       'currency' => 'EUR',
       "capture" => [
         "transaction_key" => (string) $reference->id,
