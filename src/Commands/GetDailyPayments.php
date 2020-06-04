@@ -12,7 +12,7 @@ class GetDailyPayments extends Command
      *
      * @var string
      */
-    protected $signature = 'mb:getdaily {until=1} {from=90}';
+    protected $signature = 'mb:getdaily {until=1} {from=30}';
 
     /**
      * The console command description.

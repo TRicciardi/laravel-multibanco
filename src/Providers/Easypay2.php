@@ -4,7 +4,7 @@ use tricciardi\LaravelMultibanco\Contracts\Multibanco;
 
 //models
 use tricciardi\LaravelMultibanco\Reference;
-use tricciardi\LaravelMultibanco\MBNotification;
+use tricciardi\LaravelMultibanco\MbNotification;
 
 //exceptions
 use tricciardi\LaravelMultibanco\Exceptions\EasypayException;
