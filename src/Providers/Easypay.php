@@ -252,14 +252,15 @@ class Easypay implements Multibanco {
         $not->ep_reference = $payment['ep_reference'];
         $not->ep_value = $payment['ep_value'];
         $not->t_key = ($payment['t_key'])?$payment['t_key']:'';
-        $not->ep_value = $payment['ep_value'];
+        $not->ep_value = (float) $payment['ep_value'];
         $not->ep_payment_type = $payment['ep_payment_type'];
-        $not->ep_value_fixed = $payment['ep_value_fixed'];
-        $not->ep_value_var = $payment['ep_value_var'];
-        $not->ep_value_tax = $payment['ep_value_tax'];
-        $not->ep_value_transf = $payment['ep_value_transf'];
+        $not->ep_value_fixed = (float) $payment['ep_value_fixed'];
+        $not->ep_value_var = (float) $payment['ep_value_var'];
+        $not->ep_value_tax = (float) $payment['ep_value_tax'];
+        $not->ep_value_transf = (float) $payment['ep_value_transf'];
         $not->ep_date_transf = $payment['ep_date_transf'];
         $not->ep_date = $payment['ep_date'];
+
         $not->save();
         $ref = Reference::where('reference',$not->ep_reference)->first();
 
@@ -326,14 +327,13 @@ class Easypay implements Multibanco {
           $not->ep_status = 'processed';
           $not->ep_entity = $payment['ep_entity'];
           $not->ep_reference = $payment['ep_reference'];
-          $not->ep_value = $payment['ep_value'];
+          $not->ep_value = (float) $payment['ep_value'];
           $not->t_key = ($payment['t_key'])?$payment['t_key']:'';
-          $not->ep_value = $payment['ep_value'];
           $not->ep_payment_type = $payment['ep_payment_type'];
-          $not->ep_value_fixed = $payment['ep_value_fixed'];
-          $not->ep_value_var = $payment['ep_value_var'];
-          $not->ep_value_tax = $payment['ep_value_tax'];
-          $not->ep_value_transf = $payment['ep_value_transf'];
+          $not->ep_value_fixed = (float)  $payment['ep_value_fixed'];
+          $not->ep_value_var = (float)  $payment['ep_value_var'];
+          $not->ep_value_tax = (float)  $payment['ep_value_tax'];
+          $not->ep_value_transf =  (float) $payment['ep_value_transf'];
           $not->ep_date_transf = $payment['ep_date_transf'];
           $not->ep_date = $payment['ep_payment_date'];
           $not->save();
