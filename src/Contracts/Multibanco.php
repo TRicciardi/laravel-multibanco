@@ -13,7 +13,7 @@ interface Multibanco
    *
    * @return Reference
    */
-    public function getReference(Reference $reference, $name);
+    public function getReference(Reference $reference, $name='');
 
   /**
    * make mbway purchase.
