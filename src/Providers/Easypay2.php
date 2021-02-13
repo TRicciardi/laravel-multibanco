@@ -271,30 +271,29 @@ class Easypay2 implements Multibanco {
     $references = $response->data;
     foreach($references as $ref) {
       $notification = MBNotification::where('ref_identifier',$ref->id)->first();
+        if ($ref->payment_status == 'paid') {
+            if(!$notification) {
+                $notification = new MBNotification;
+                $notification->ref_identifier = $ref->id;
+                $notification->state = 0;
+                $notification->payload = json_encode($ref);
+                $notification->save();
+            }
 
-      if(!$notification) {
-        $notification = new MBNotification;
-        $notification->ref_identifier = $ref->id;
-        $notification->state = 0;
-        $notification->payload = json_encode($ref);
-        $notification->save();
-      }
-
-      $mine = Reference::where('provider_id', $ref->id)->first();
-      if($mine && $mine->state != 1) {
-        if($ref->payment_status == 'paid') {
-          $mine->state = 1;
-          $mine->paid_value = $ref->value;
-          $mine->paid_date = $ref->paid_at;
-          $mine->save();
-          $notification->state = 1;
-          $notification->save();
-          event(new PaymentReceived($mine));
+            $mine = Reference::where('provider_id', $ref->id)->first();
+            if($mine && $mine->state != 1) {
+                $mine->state = 1;
+                $mine->paid_value = $ref->value;
+                $mine->paid_date = $ref->paid_at;
+                $mine->save();
+                $notification->state = 1;
+                $notification->save();
+                event(new PaymentReceived($mine));
+            } elseif(!$mine) {
+                $notification->state = -1;
+                $notification->save();
+            }
         }
-      } elseif(!$mine) {
-        $notification->state = -1;
-        $notification->save();
-      }
     }
     if($pages > $page) {
       $this->getPayments($date_start, $date_end, $page+1);
