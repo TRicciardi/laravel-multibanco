@@ -240,12 +240,18 @@ class Easypay2 implements Multibanco {
       if($response->id == $not->ref_identifier) {
         $ref = Reference::where('provider_id', $response->id)->first();
         if($ref) {
-          if($response->payment_status == 'paid') {
+          if($response->payment_status == 'pending') {
+          } elseif($response->payment_status == 'paid') {
             $ref->state = 1;
             $ref->paid_value = $response->value;
             $ref->paid_date = $response->paid_at;
             $ref->save();
             event(new PaymentReceived($ref));
+            $not->state = 1;
+            $not->save();
+          } else {
+            $ref->state = -2;
+            $ref->save();
             $not->state = 1;
             $not->save();
           }
